@@ -13,7 +13,7 @@ export default defineConfig({
       prettier: false,
     },
     hooks: {
-      afterAllFilesWrite: 'bunx @biomejs/biome check --write .',
+      afterAllFilesWrite: 'npx @biomejs/biome check --write .',
     },
   },
 });

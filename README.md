@@ -1,5 +1,11 @@
 # @suzumiyaaoba/voicevox-client
 
+[![CI](https://github.com/SuzumiyaAoba/voicevox-client/actions/workflows/ci.yml/badge.svg)](https://github.com/SuzumiyaAoba/voicevox-client/actions/workflows/ci.yml)
+[![Security](https://github.com/SuzumiyaAoba/voicevox-client/actions/workflows/security.yml/badge.svg)](https://github.com/SuzumiyaAoba/voicevox-client/actions/workflows/security.yml)
+[![npm version](https://badge.fury.io/js/%40suzumiyaaoba%2Fvoicevox-client.svg)](https://badge.fury.io/js/%40suzumiyaaoba%2Fvoicevox-client)
+[![codecov](https://codecov.io/gh/SuzumiyaAoba/voicevox-client/branch/main/graph/badge.svg)](https://codecov.io/gh/SuzumiyaAoba/voicevox-client)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 VOICEVOX ENGINE OSS向けのTypeScriptクライアントライブラリです。[Orval](https://orval.dev)を使用してOpenAPIスキーマから自動生成されています。
 
 ## インストール
@@ -76,50 +82,50 @@ console.log(dictWordsResponse.data);
 ### 依存関係のインストール
 
 ```bash
-bun install
+npm install
 ```
 
 ### テストの実行
 
 ```bash
 # 通常のテスト実行
-bun run test
+npm run test
 
 # ワンタイムテスト実行
-bun run test:run
+npm run test:run
 
 # カバレッジ付きテスト
-bun run test:coverage
+npm run test:coverage
 
 # UI付きテスト
-bun run test:ui
+npm run test:ui
 ```
 
 ### ビルド
 
 ```bash
 # ESMビルド
-bun run build
+npm run build
 
 # ESM + CJS デュアルビルド
-bun run build:dual
+npm run build:dual
 ```
 
 ### コードフォーマット
 
 ```bash
 # チェックのみ
-bun run check
+npm run check
 
 # 自動修正
-bun run fix
+npm run fix
 ```
 
 ### スキーマの更新
 
 ```bash
 # ローカルのVOICEVOXサーバーからスキーマを更新
-bun run update-schema
+npm run update-schema
 ```
 
 ## ライセンス

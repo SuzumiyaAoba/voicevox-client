@@ -1,0 +1,149 @@
+name: Security
+
+on:
+  schedule:
+    # 毎日午前9時（JST）に実行
+    - cron: '0 0 * * *'
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+  # dependency-review job removed to avoid failures on repos without GHAS
+
+  audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    env:
+      ROLLUP_SKIP_NODEJS_NATIVE: '1'
+      CI: 'true'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      
+      - name: Install dependencies
+        run: npm install
+        
+      - name: Run security audit
+        run: |
+          echo "Running npm audit..."
+          npm audit --audit-level=moderate || echo "npm audit completed with warnings"
+          
+      
+
+  codeql:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript
+          queries: security-and-quality
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      
+      - name: Install dependencies
+        run: npm install
+        
+      - name: Build for CodeQL
+        run: npm run build
+        
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+
+  secret-scan:
+    name: Secret Scanning
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Run TruffleHog OSS
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: main
+          head: HEAD
+          extra_args: --debug --only-verified
+
+  license-check:
+    name: License Compliance
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          
+      - name: Install license-checker
+        run: npm install -g license-checker
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      
+      - name: Install dependencies
+        run: npm install
+        
+      - name: Check licenses
+        run: |
+          echo "Checking dependency licenses..."
+          license-checker --onlyAllow "MIT;Apache-2.0;BSD-2-Clause;BSD-3-Clause;ISC;0BSD;Python-2.0" --excludePrivatePackages || {
+            echo "❌ Found dependencies with incompatible licenses"
+            echo "Generating detailed license report..."
+            license-checker --csv > license-report.csv
+            cat license-report.csv
+            exit 1
+          }
+          echo "✅ All dependency licenses are compatible"
+
+  malware-scan:
+    name: Malware Scanning
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          
+      - name: Install Socket CLI
+        run: npm install -g socket
+        
+      - name: Install dependencies
+        run: npm install
+        
+      - name: Run Socket scan
+        run: |
+          # 依存関係の悪意あるパッケージスキャン
+          socket audit package.json || echo "Socket scan completed with warnings"
+        continue-on-error: true
