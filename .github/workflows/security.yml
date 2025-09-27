@@ -18,7 +18,8 @@ jobs:
   dependency-review:
     name: Dependency Review
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
+    # Run only for PRs on public repositories (private repos require GHAS)
+    if: github.event_name == 'pull_request' && github.repository_visibility == 'public'
     
     steps:
       - name: Checkout code
