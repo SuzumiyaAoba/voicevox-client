@@ -149,14 +149,14 @@ jobs:
         with:
           node-version: 20
           
-      - name: Install SocketDev CLI
-        run: npm install -g @socket.dev/cli
+      - name: Install Socket CLI
+        run: npm install -g socket
         
       - name: Install dependencies
         run: npm install
         
-      - name: Run Socket.dev scan
+      - name: Run Socket scan
         run: |
           # 依存関係の悪意あるパッケージスキャン
-          npx @socket.dev/cli audit package.json || echo "Socket.dev scan completed with warnings"
+          socket audit package.json || echo "Socket scan completed with warnings"
         continue-on-error: true
