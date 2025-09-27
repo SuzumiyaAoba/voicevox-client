@@ -62,6 +62,20 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Version to publish: $VERSION"
           
+      - name: Get current UTC timestamp
+        id: timestamp
+        run: |
+          UTC_TIME=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          echo "utc_time=$UTC_TIME" >> $GITHUB_OUTPUT
+          echo "Current UTC time: $UTC_TIME"
+          
+      - name: Get previous tag for changelog
+        id: previous_tag
+        run: |
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+          echo "previous_tag=$PREV_TAG" >> $GITHUB_OUTPUT
+          echo "Previous tag: $PREV_TAG"
+          
       - name: Update package version (skip if unchanged)
         run: |
           TAG_VERSION=${{ steps.version.outputs.version }}
@@ -102,7 +116,7 @@ jobs:
             
             - **Package**: [@suzumiyaaoba/voicevox-client](https://www.npmjs.com/package/@suzumiyaaoba/voicevox-client)
             - **Version**: ${{ steps.version.outputs.version }}
-            - **Published**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+            - **Published**: ${{ steps.timestamp.outputs.utc_time }}
             - **Node.js Support**: >= 18.0.0
             
             ### 🔒 Security & Verification
@@ -125,7 +139,7 @@ jobs:
             
             ---
             
-            **Full Changelog**: https://github.com/${{ github.repository }}/compare/$(git describe --tags --abbrev=0 HEAD^)...v${{ steps.version.outputs.version }}
+            **Full Changelog**: https://github.com/${{ github.repository }}/compare/${{ steps.previous_tag.outputs.previous_tag }}...v${{ steps.version.outputs.version }}
           draft: false
           prerelease: ${{ contains(steps.version.outputs.version, 'alpha') || contains(steps.version.outputs.version, 'beta') || contains(steps.version.outputs.version, 'rc') }}
           generate_release_notes: true
