@@ -7,7 +7,7 @@ on:
       - 'v*.*.*-*'  # v1.0.0-alpha.1, v1.0.0-beta.1 etc.
 
 permissions:
-  contents: read
+  contents: write # for creating GitHub releases
   id-token: write # for npm provenance
 
 jobs:
