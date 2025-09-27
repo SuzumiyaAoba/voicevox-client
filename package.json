@@ -52,9 +52,8 @@
     "voicevox:start": "docker-compose up -d voicevox",
     "voicevox:stop": "docker-compose down",
     "voicevox:logs": "docker-compose logs -f voicevox",
-    "prepublishOnly": "npm run test:run && npm run build:dual",
-    "prepare": "husky",
-    "postinstall": "npm run generate"
+    "prepublishOnly": "npm run generate && npm run test:run && npm run build:dual",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.2.4",
