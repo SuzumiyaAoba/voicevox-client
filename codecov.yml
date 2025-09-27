@@ -1,0 +1,32 @@
+codecov:
+  require_ci_to_pass: true
+
+coverage:
+  precision: 2
+  round: down
+  range: "50...90"
+  status:
+    project:
+      default:
+        # Target coverage compared against the base. "auto" = Codecov infers target
+        target: auto
+        # Allow small fluctuations without failing
+        threshold: 1%
+        base: auto
+    patch:
+      default:
+        # Require minimum coverage on changed lines (patch)
+        target: 60%
+        threshold: 1%
+
+ignore:
+  - "dist/**"
+  - "coverage/**"
+  - "**/*.d.ts"
+  - "node_modules/**"
+
+comment:
+  layout: "reach, diff, flags, files"
+  behavior: default
+  require_changes: false
+
