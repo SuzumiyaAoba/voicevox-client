@@ -68,6 +68,9 @@
     "vite": "^7.1.7",
     "vitest": "^3.2.4"
   },
+  "optionalDependencies": {
+    "@biomejs/cli-linux-x64": "^2.2.4"
+  },
   "peerDependencies": {
     "typescript": "^5.9.2"
   },
