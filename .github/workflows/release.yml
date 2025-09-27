@@ -62,10 +62,17 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Version to publish: $VERSION"
           
-      - name: Update package version
+      - name: Update package version (skip if unchanged)
         run: |
-          npm version ${{ steps.version.outputs.version }} --no-git-tag-version
-          echo "Updated package.json version to ${{ steps.version.outputs.version }}"
+          TAG_VERSION=${{ steps.version.outputs.version }}
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          echo "Current package.json version: $CURRENT_VERSION"
+          if [ "$CURRENT_VERSION" = "$TAG_VERSION" ]; then
+            echo "Version unchanged. Skipping npm version."
+          else
+            npm version "$TAG_VERSION" --no-git-tag-version
+            echo "Updated package.json version to $TAG_VERSION"
+          fi
           
       - name: Publish to NPM with provenance
         run: |
