@@ -14,17 +14,15 @@ jobs:
   release:
     name: Release to NPM
     runs-on: ubuntu-latest
+    env:
+      ROLLUP_SKIP_NODEJS_NATIVE: '1'
+      CI: 'true'
     environment: release # 保護された環境を使用
     
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v1
-        with:
-          bun-version: latest
-          
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -32,23 +30,23 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           
       - name: Install dependencies
-        run: bun install --frozen-lockfile
+        run: npm install
         
       - name: Generate API types
-        run: bun run generate
+        run: npm run generate
         
       - name: Run security audit
-        run: bun audit
+        run: npm audit --audit-level=moderate
         continue-on-error: true
         
       - name: Run all tests
-        run: bun run test:run
+        run: npm run test:run
         
       - name: Run linter
-        run: bun run check
+        run: npm run check
         
       - name: Build package
-        run: bun run build:dual
+        run: npm run build:dual
         
       - name: Verify package contents
         run: |
