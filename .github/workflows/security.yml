@@ -15,21 +15,7 @@ permissions:
   actions: read
 
 jobs:
-  dependency-review:
-    name: Dependency Review
-    runs-on: ubuntu-latest
-    # Run only for PRs on public repositories (private repos require GHAS)
-    if: github.event_name == 'pull_request' && github.repository_visibility == 'public'
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        
-      - name: Dependency Review
-        uses: actions/dependency-review-action@v4
-        with:
-          fail-on-severity: moderate
-          comment-summary-in-pr: true
+  # dependency-review job removed to avoid failures on repos without GHAS
 
   audit:
     name: Security Audit
