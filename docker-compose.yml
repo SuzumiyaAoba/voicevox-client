@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  voicevox:
+    image: voicevox/voicevox_engine:latest
+    ports:
+      - "50021:50021"
+    environment:
+      - VOICEVOX_CPU_NUM_THREADS=2
+    volumes:
+      - voicevox_data:/app/speaker_info
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:50021/docs"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  voicevox_data:

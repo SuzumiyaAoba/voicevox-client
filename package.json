@@ -1,0 +1,51 @@
+{
+  "name": "@suzumiyaaoba/voicevox-client",
+  "version": "0.1.0",
+  "description": "VOICEVOX API Client generated with orval",
+  "type": "module",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "private": true,
+  "scripts": {
+    "dev": "bun run --watch src/index.ts",
+    "build": "bun build src/index.ts --outdir dist --target bun",
+    "generate": "orval --config ./orval.config.ts",
+    "format": "bunx @biomejs/biome check --write .",
+    "check": "bunx @biomejs/biome check .",
+    "test": "bun test",
+    "update-schema": "curl -s -o api-schema/openapi.json http://localhost:50021/openapi.json && echo 'OpenAPI schema updated from local server' && bun run generate",
+    "voicevox:start": "docker-compose up -d voicevox",
+    "voicevox:stop": "docker-compose down",
+    "voicevox:logs": "docker-compose logs -f voicevox",
+    "prepare": "husky",
+    "postinstall": "bun run generate"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.2.4",
+    "@tsconfig/strictest": "^2.0.6",
+    "@types/bun": "latest",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.1",
+    "orval": "^7.12.2"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "keywords": [
+    "voicevox",
+    "api-client",
+    "typescript",
+    "orval"
+  ],
+  "license": "MIT",
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "bunx @biomejs/biome check --write --no-errors-on-unmatched"
+    ],
+    "*.{json,md}": [
+      "bunx @biomejs/biome format --write --no-errors-on-unmatched"
+    ]
+  }
+}
