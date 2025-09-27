@@ -1,7 +1,23 @@
 {
   "name": "@suzumiyaaoba/voicevox-client",
   "version": "0.1.0",
-  "description": "VOICEVOX API Client generated with orval",
+  "description": "TypeScript client library for VOICEVOX ENGINE OSS. Auto-generated from OpenAPI schema using Orval.",
+  "homepage": "https://github.com/SuzumiyaAoba/voicevox-client",
+  "bugs": {
+    "url": "https://github.com/SuzumiyaAoba/voicevox-client/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SuzumiyaAoba/voicevox-client.git"
+  },
+  "author": {
+    "name": "SuzumiyaAoba",
+    "url": "https://github.com/SuzumiyaAoba"
+  },
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/SuzumiyaAoba"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -13,7 +29,10 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
   ],
   "private": false,
   "scripts": {
@@ -54,11 +73,27 @@
   },
   "keywords": [
     "voicevox",
+    "voice-synthesis",
+    "tts",
+    "text-to-speech",
     "api-client",
     "typescript",
-    "orval"
+    "openapi",
+    "orval",
+    "audio",
+    "speech",
+    "japanese",
+    "voicevox-engine"
   ],
   "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
       "bunx @biomejs/biome check --write --no-errors-on-unmatched"

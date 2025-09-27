@@ -1,5 +1,11 @@
 # @suzumiyaaoba/voicevox-client
 
+[![CI](https://github.com/SuzumiyaAoba/voicevox-client/actions/workflows/ci.yml/badge.svg)](https://github.com/SuzumiyaAoba/voicevox-client/actions/workflows/ci.yml)
+[![Security](https://github.com/SuzumiyaAoba/voicevox-client/actions/workflows/security.yml/badge.svg)](https://github.com/SuzumiyaAoba/voicevox-client/actions/workflows/security.yml)
+[![npm version](https://badge.fury.io/js/%40suzumiyaaoba%2Fvoicevox-client.svg)](https://badge.fury.io/js/%40suzumiyaaoba%2Fvoicevox-client)
+[![codecov](https://codecov.io/gh/SuzumiyaAoba/voicevox-client/branch/main/graph/badge.svg)](https://codecov.io/gh/SuzumiyaAoba/voicevox-client)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 VOICEVOX ENGINE OSS向けのTypeScriptクライアントライブラリです。[Orval](https://orval.dev)を使用してOpenAPIスキーマから自動生成されています。
 
 ## インストール

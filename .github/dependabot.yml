@@ -1,0 +1,68 @@
+version: 2
+
+updates:
+  # NPM dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Tokyo"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "suzumiyaaoba"
+    assignees:
+      - "suzumiyaaoba"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "javascript"
+    # セキュリティアップデートを優先
+    allow:
+      - dependency-type: "all"
+    # メジャーバージョンアップは手動レビューが必要
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "10:00"
+      timezone: "Asia/Tokyo"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "suzumiyaaoba"
+    assignees:
+      - "suzumiyaaoba"
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "github-actions"
+
+  # Docker (もしDockerfileがある場合)
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      time: "09:00"
+      timezone: "Asia/Tokyo"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "suzumiyaaoba"
+    assignees:
+      - "suzumiyaaoba"
+    commit-message:
+      prefix: "docker"
+    labels:
+      - "dependencies"
+      - "docker"

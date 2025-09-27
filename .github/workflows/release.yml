@@ -1,0 +1,152 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+  id-token: write # for npm provenance
+
+jobs:
+  release:
+    name: Release to NPM
+    runs-on: ubuntu-latest
+    environment: release # 保護された環境を使用
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: 'https://registry.npmjs.org'
+          
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+        
+      - name: Generate API types
+        run: bun run generate
+        
+      - name: Run security audit
+        run: bun audit
+        continue-on-error: true
+        
+      - name: Run all tests
+        run: bun run test:run
+        
+      - name: Run linter
+        run: bun run check
+        
+      - name: Build package
+        run: bun run build:dual
+        
+      - name: Verify package contents
+        run: |
+          npm pack --dry-run
+          ls -la dist/
+          
+      - name: Extract version from tag
+        id: version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Version to publish: $VERSION"
+          
+      - name: Update package version
+        run: |
+          npm version ${{ steps.version.outputs.version }} --no-git-tag-version
+          
+      - name: Publish to NPM with provenance
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ steps.version.outputs.version }}
+          body: |
+            ## Changes in v${{ steps.version.outputs.version }}
+            
+            See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for details.
+            
+            ## Installation
+            
+            ```bash
+            npm install @suzumiyaaoba/voicevox-client@${{ steps.version.outputs.version }}
+            ```
+            
+            ## Verification
+            
+            This package was published with npm provenance. You can verify the build provenance:
+            
+            ```bash
+            npm audit signatures
+            ```
+          draft: false
+          prerelease: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
+
+  post-release:
+    name: Post-release checks
+    needs: release
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Wait for package to be available
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "Waiting for package @suzumiyaaoba/voicevox-client@$VERSION to be available..."
+          
+          # NPM公開後の反映を待つ
+          sleep 60
+          
+          # パッケージの存在確認
+          if npm view @suzumiyaaoba/voicevox-client@$VERSION > /dev/null 2>&1; then
+            echo "✅ Package successfully published and available!"
+          else
+            echo "❌ Package not found on NPM registry"
+            exit 1
+          fi
+          
+      - name: Test installation
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          mkdir test-install
+          cd test-install
+          npm init -y
+          npm install @suzumiyaaoba/voicevox-client@$VERSION
+          
+          # 基本的なインポートテスト
+          node -e "
+            try {
+              const client = require('@suzumiyaaoba/voicevox-client');
+              console.log('✅ CommonJS import successful');
+              console.log('Available exports:', Object.keys(client).slice(0, 10).join(', '), '...');
+            } catch (error) {
+              console.error('❌ CommonJS import failed:', error.message);
+              process.exit(1);
+            }
+          "
+          
+          # ESM インポートテスト
+          node -e "
+            import('@suzumiyaaoba/voicevox-client').then(client => {
+              console.log('✅ ESM import successful');
+              console.log('Available exports:', Object.keys(client).slice(0, 10).join(', '), '...');
+            }).catch(error => {
+              console.error('❌ ESM import failed:', error.message);
+              process.exit(1);
+            });
+          "
