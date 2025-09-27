@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   audioQuery,
   CorsPolicyMode,
@@ -9,14 +9,14 @@ import {
   synthesis,
   version,
   WordTypes,
-} from './index.js';
+} from './index';
 
 // fetchのモック
-global.fetch = vi.fn();
+global.fetch = vi.fn() as unknown as typeof fetch;
 
 describe('VOICEVOX Client', () => {
   afterEach(() => {
-    vi.resetAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Basic API calls', () => {

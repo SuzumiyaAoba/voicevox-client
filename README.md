@@ -82,50 +82,50 @@ console.log(dictWordsResponse.data);
 ### 依存関係のインストール
 
 ```bash
-bun install
+npm install
 ```
 
 ### テストの実行
 
 ```bash
 # 通常のテスト実行
-bun run test
+npm run test
 
 # ワンタイムテスト実行
-bun run test:run
+npm run test:run
 
 # カバレッジ付きテスト
-bun run test:coverage
+npm run test:coverage
 
 # UI付きテスト
-bun run test:ui
+npm run test:ui
 ```
 
 ### ビルド
 
 ```bash
 # ESMビルド
-bun run build
+npm run build
 
 # ESM + CJS デュアルビルド
-bun run build:dual
+npm run build:dual
 ```
 
 ### コードフォーマット
 
 ```bash
 # チェックのみ
-bun run check
+npm run check
 
 # 自動修正
-bun run fix
+npm run fix
 ```
 
 ### スキーマの更新
 
 ```bash
 # ローカルのVOICEVOXサーバーからスキーマを更新
-bun run update-schema
+npm run update-schema
 ```
 
 ## ライセンス

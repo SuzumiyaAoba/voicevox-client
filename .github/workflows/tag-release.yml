@@ -1,0 +1,78 @@
+name: Tag and Release
+
+# 手動でリリースタグを作成するワークフロー
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., 1.0.0)'
+        required: true
+        type: string
+      prerelease:
+        description: 'Is this a prerelease?'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  create-tag:
+    name: Create Release Tag
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Validate version format
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          if [[ ! $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9]+(\.[0-9]+)?)?$ ]]; then
+            echo "❌ Invalid version format: $VERSION"
+            echo "Valid formats: 1.0.0, 1.0.0-alpha.1, 1.0.0-beta, etc."
+            exit 1
+          fi
+          echo "✅ Version format is valid: $VERSION"
+          
+      - name: Check if tag already exists
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          if git tag -l | grep -q "^v$VERSION$"; then
+            echo "❌ Tag v$VERSION already exists"
+            exit 1
+          fi
+          echo "✅ Tag v$VERSION does not exist yet"
+          
+      - name: Setup Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+      - name: Update package.json version
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          npm version $VERSION --no-git-tag-version
+          git add package.json
+          git commit -m "chore: bump version to $VERSION"
+          
+      - name: Create and push tag
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          PRERELEASE="${{ github.event.inputs.prerelease }}"
+          
+          if [ "$PRERELEASE" = "true" ]; then
+            TAG_MESSAGE="Pre-release v$VERSION"
+          else
+            TAG_MESSAGE="Release v$VERSION"
+          fi
+          
+          git tag -a "v$VERSION" -m "$TAG_MESSAGE"
+          git push origin main
+          git push origin "v$VERSION"
+          
+          echo "🏷️ Created and pushed tag: v$VERSION"
+          echo "🚀 Release workflow will be triggered automatically"

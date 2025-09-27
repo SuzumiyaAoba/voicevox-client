@@ -3,7 +3,8 @@ name: Release
 on:
   push:
     tags:
-      - 'v*'
+      - 'v*.*.*'  # v1.0.0, v0.1.0 etc.
+      - 'v*.*.*-*'  # v1.0.0-alpha.1, v1.0.0-beta.1 etc.
 
 permissions:
   contents: read
@@ -64,39 +65,63 @@ jobs:
       - name: Update package version
         run: |
           npm version ${{ steps.version.outputs.version }} --no-git-tag-version
+          echo "Updated package.json version to ${{ steps.version.outputs.version }}"
           
       - name: Publish to NPM with provenance
-        run: npm publish --provenance --access public
+        run: |
+          echo "Publishing package with provenance..."
+          npm publish --provenance --access public
+          echo "✅ Package successfully published to npm!"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           
       - name: Create GitHub Release
-        uses: actions/create-release@v1
+        uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ steps.version.outputs.version }}
+          tag_name: v${{ steps.version.outputs.version }}
+          name: Release v${{ steps.version.outputs.version }}
           body: |
-            ## Changes in v${{ steps.version.outputs.version }}
+            ## 🚀 Release v${{ steps.version.outputs.version }}
             
-            See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for details.
-            
-            ## Installation
+            ### 📦 Installation
             
             ```bash
             npm install @suzumiyaaoba/voicevox-client@${{ steps.version.outputs.version }}
             ```
             
-            ## Verification
+            ### 📋 Package Information
             
-            This package was published with npm provenance. You can verify the build provenance:
+            - **Package**: [@suzumiyaaoba/voicevox-client](https://www.npmjs.com/package/@suzumiyaaoba/voicevox-client)
+            - **Version**: ${{ steps.version.outputs.version }}
+            - **Published**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+            - **Node.js Support**: >= 18.0.0
+            
+            ### 🔒 Security & Verification
+            
+            This package was published with npm provenance for enhanced security:
             
             ```bash
+            # Verify package signatures
             npm audit signatures
+            
+            # View package information
+            npm view @suzumiyaaoba/voicevox-client@${{ steps.version.outputs.version }}
             ```
+            
+            ### 📖 Documentation
+            
+            - [README](https://github.com/${{ github.repository }}#readme)
+            - [API Documentation](https://github.com/${{ github.repository }}/tree/main/api-schema)
+            - [Examples](https://github.com/${{ github.repository }}#使用方法)
+            
+            ---
+            
+            **Full Changelog**: https://github.com/${{ github.repository }}/compare/$(git describe --tags --abbrev=0 HEAD^)...v${{ steps.version.outputs.version }}
           draft: false
-          prerelease: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
+          prerelease: ${{ contains(steps.version.outputs.version, 'alpha') || contains(steps.version.outputs.version, 'beta') || contains(steps.version.outputs.version, 'rc') }}
+          generate_release_notes: true
 
   post-release:
     name: Post-release checks
@@ -120,20 +145,51 @@ jobs:
             exit 1
           fi
           
-      - name: Test installation
+      - name: Test installation and imports
         run: |
           VERSION=${GITHUB_REF#refs/tags/v}
-          mkdir test-install
+          echo "Testing installation of @suzumiyaaoba/voicevox-client@$VERSION"
+          
+          # 一時的なテスト環境作成
+          mkdir -p test-install
           cd test-install
           npm init -y
-          npm install @suzumiyaaoba/voicevox-client@$VERSION
           
-          # 基本的なインポートテスト
+          # パッケージインストール（リトライ機能付き）
+          for i in {1..3}; do
+            echo "Attempt $i: Installing package..."
+            if npm install @suzumiyaaoba/voicevox-client@$VERSION; then
+              echo "✅ Package installation successful on attempt $i"
+              break
+            else
+              echo "❌ Installation failed on attempt $i"
+              if [ $i -eq 3 ]; then
+                echo "❌ All installation attempts failed"
+                exit 1
+              fi
+              sleep 10
+            fi
+          done
+          
+          # パッケージ情報確認
+          npm list @suzumiyaaoba/voicevox-client
+          
+          # CommonJS インポートテスト
           node -e "
             try {
               const client = require('@suzumiyaaoba/voicevox-client');
               console.log('✅ CommonJS import successful');
-              console.log('Available exports:', Object.keys(client).slice(0, 10).join(', '), '...');
+              const exports = Object.keys(client);
+              console.log('Available exports count:', exports.length);
+              console.log('Sample exports:', exports.slice(0, 5).join(', '));
+              
+              // 主要な関数の存在確認
+              if (typeof client.speakers === 'function') {
+                console.log('✅ speakers function available');
+              }
+              if (typeof client.audioQuery === 'function') {
+                console.log('✅ audioQuery function available');
+              }
             } catch (error) {
               console.error('❌ CommonJS import failed:', error.message);
               process.exit(1);
@@ -141,12 +197,32 @@ jobs:
           "
           
           # ESM インポートテスト
-          node -e "
+          node --input-type=module -e "
             import('@suzumiyaaoba/voicevox-client').then(client => {
               console.log('✅ ESM import successful');
-              console.log('Available exports:', Object.keys(client).slice(0, 10).join(', '), '...');
+              const exports = Object.keys(client);
+              console.log('Available exports count:', exports.length);
+              console.log('Sample exports:', exports.slice(0, 5).join(', '));
+              
+              // 主要な関数の存在確認
+              if (typeof client.speakers === 'function') {
+                console.log('✅ speakers function available (ESM)');
+              }
+              if (typeof client.audioQuery === 'function') {
+                console.log('✅ audioQuery function available (ESM)');
+              }
             }).catch(error => {
               console.error('❌ ESM import failed:', error.message);
               process.exit(1);
             });
           "
+          
+          # 型定義ファイル確認
+          if [ -f node_modules/@suzumiyaaoba/voicevox-client/dist/index.d.ts ]; then
+            echo "✅ TypeScript definitions found"
+          else
+            echo "❌ TypeScript definitions missing"
+            exit 1
+          fi
+          
+          echo "🎉 All installation tests passed!"
