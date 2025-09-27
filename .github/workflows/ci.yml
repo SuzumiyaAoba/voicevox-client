@@ -30,8 +30,10 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           
-      - name: Install dependencies
-        run: npm install
+      - name: Clean install
+        run: |
+          rm -rf node_modules package-lock.json
+          npm install
         
       - name: Run linter
         run: npm run check
@@ -61,8 +63,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         
-      - name: Install dependencies
-        run: npm install
+      - name: Clean install
+        run: |
+          rm -rf node_modules package-lock.json
+          npm install
         
       - name: Build package
         run: npm run build:dual
@@ -96,8 +100,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         
-      - name: Install dependencies
-        run: npm install
+      - name: Clean install
+        run: |
+          rm -rf node_modules package-lock.json
+          npm install
         
       - name: Generate API types
         run: npm run generate
