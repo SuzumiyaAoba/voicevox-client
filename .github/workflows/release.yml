@@ -29,8 +29,10 @@ jobs:
           node-version: 20
           registry-url: 'https://registry.npmjs.org'
           
-      - name: Install dependencies
-        run: npm install
+      - name: Clean install
+        run: |
+          rm -rf node_modules package-lock.json
+          npm install
         
       - name: Generate API types
         run: npm run generate
