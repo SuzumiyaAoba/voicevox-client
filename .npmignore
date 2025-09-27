@@ -1,0 +1,40 @@
+# Source files
+src/
+*.test.ts
+*.spec.ts
+
+# Development files
+.env
+.env.*
+*.log
+coverage/
+vitest.config.ts
+tsconfig.json
+tsconfig.build.json
+orval.config.ts
+biome.json
+
+# Git
+.git/
+.gitignore
+
+# Dependencies
+node_modules/
+
+# Build artifacts
+dist-cjs/
+
+# Docker
+docker-compose.yml
+Dockerfile*
+
+# Documentation (if not needed for package)
+README.md
+api-schema/
+
+# IDE
+.vscode/
+.idea/
+
+# Husky
+.husky/

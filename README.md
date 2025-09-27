@@ -1,122 +1,137 @@
-# VOICEBOX Client
+# @suzumiyaaoba/voicevox-client
 
-VOICEVOX API の TypeScript クライアントライブラリ
+VOICEVOX ENGINE OSS向けのTypeScriptクライアントライブラリです。[Orval](https://orval.dev)を使用してOpenAPIスキーマから自動生成されています。
 
-## 前提条件
-
-- [Nix](https://nixos.org/download/) がインストールされていること
-- [Docker](https://www.docker.com/) が動作していること（VOICEVOX API サーバー用）
-
-## 開発環境のセットアップ
-
-### 1. Nix 開発環境への入場
+## インストール
 
 ```bash
-nix develop
+npm install @suzumiyaaoba/voicevox-client
 ```
 
-または direnv を使用している場合：
+## 使用方法
 
-```bash
-direnv allow
+### 基本的な使用例
+
+```typescript
+import { speakers, audioQuery, synthesis } from '@suzumiyaaoba/voicevox-client';
+
+// スピーカー一覧を取得
+const speakersResponse = await speakers();
+console.log(speakersResponse.data);
+
+// 音声合成用のクエリを作成
+const audioQueryResponse = await audioQuery({
+  text: 'こんにちは',
+  speaker: 3
+});
+
+// 音声を合成
+const synthesisResponse = await synthesis(audioQueryResponse.data, {
+  speaker: 3
+});
+
+// Blobとして音声データを取得
+const audioBlob = synthesisResponse.data;
 ```
 
-### 2. 依存関係のインストール
+### その他のAPI
+
+```typescript
+import { 
+  version, 
+  coreVersions, 
+  supportedDevices,
+  getUserDictWords,
+  addUserDictWord
+} from '@suzumiyaaoba/voicevox-client';
+
+// エンジンのバージョンを取得
+const versionResponse = await version();
+console.log(versionResponse.data);
+
+// 対応デバイス情報を取得
+const devicesResponse = await supportedDevices();
+console.log(devicesResponse.data);
+
+// ユーザー辞書の単語を取得
+const dictWordsResponse = await getUserDictWords();
+console.log(dictWordsResponse.data);
+```
+
+## API仕様
+
+このライブラリは以下のVOICEVOX ENGINE APIエンドポイントをサポートしています：
+
+- 音声合成関連（synthesis, audioQuery, etc.）
+- スピーカー情報（speakers, speakerInfo）
+- 歌唱音声合成（singFrameAudioQuery, frameSynthesis）
+- ユーザー辞書（user_dict関連）
+- プリセット管理（presets関連）
+- その他（version, coreVersions, etc.）
+
+詳細なAPI仕様については、[VOICEVOX ENGINE](https://github.com/VOICEVOX/voicevox_engine)のドキュメントを参照してください。
+
+## 開発
+
+### 依存関係のインストール
 
 ```bash
 bun install
 ```
 
-### 3. VOICEVOX API サーバーの起動
+### テストの実行
 
 ```bash
-bun run voicevox:start
-```
+# 通常のテスト実行
+bun run test
 
-サーバーが起動したら、http://localhost:50021/docs でAPI仕様を確認できます。
+# ワンタイムテスト実行
+bun run test:run
 
-## OpenAPI スキーマの更新
+# カバレッジ付きテスト
+bun run test:coverage
 
-### GitHub から最新スキーマを取得（推奨）
-
-```bash
-bun run update-schema
-```
-
-### ローカルサーバーからスキーマを取得
-
-```bash
-# 先にVOICEVOX APIサーバーを起動
-bun run voicevox:start
-
-# ローカルサーバーからスキーマを取得
-bun run update-schema:local
-```
-
-どちらのコマンドも、スキーマ取得後に自動的にAPIクライアントを再生成します。
-
-## 使用方法
-
-### API クライアントの生成
-
-API スキーマファイルを `api-schema/openapi.json` に配置してから：
-
-```bash
-bun run generate
-```
-
-### 開発モードでの実行
-
-```bash
-bun run dev
+# UI付きテスト
+bun run test:ui
 ```
 
 ### ビルド
 
 ```bash
+# ESMビルド
 bun run build
+
+# ESM + CJS デュアルビルド
+bun run build:dual
 ```
 
-## 利用可能なコマンド
+### コードフォーマット
 
-| コマンド | 説明 |
-|----------|------|
-| `bun run dev` | 開発モードで実行（ファイル監視あり） |
-| `bun run build` | プロダクション用ビルド |
-| `bun run generate` | orval で API クライアントを生成 |
-| `bun run update-schema` | GitHub から OpenAPI スキーマを更新し、APIクライアントを再生成 |
-| `bun run update-schema:local` | ローカルサーバーから OpenAPI スキーマを更新し、APIクライアントを再生成 |
-| `bun run check` | コードの静的解析（Biome） |
-| `bun run format` | コードフォーマット |
-| `bun run test` | テスト実行 |
-| `bun run voicevox:start` | VOICEVOX API サーバー起動 |
-| `bun run voicevox:stop` | VOICEVOX API サーバー停止 |
-| `bun run voicevox:logs` | VOICEVOX API サーバーのログ表示 |
+```bash
+# チェックのみ
+bun run check
 
-## ディレクトリ構造
-
-```
-.
-├── api-schema/          # OpenAPI スキーマファイル
-├── src/
-│   ├── api/
-│   │   ├── generated.ts # 生成された API クライアント
-│   │   └── mutator.ts   # HTTP クライアント設定
-│   ├── client.ts        # クライアントラッパー
-│   └── index.ts         # メインエクスポート
-├── flake.nix           # Nix 環境設定
-├── docker-compose.yml  # VOICEVOX API サーバー設定
-├── orval.config.ts     # API クライアント生成設定
-└── biome.json          # リンター・フォーマッター設定
+# 自動修正
+bun run fix
 ```
 
-## 開発ガイドライン
+### スキーマの更新
 
-- [[memory:5943006]] アロー関数を使用する
-- [[memory:5689662]] Biome を使用してコードの品質を保つ
-- [[memory:5689715]] 生成されたコードは `bun run check` の対象外
-- コミット前に自動的にlint-stagedによる品質チェックが実行される
+```bash
+# ローカルのVOICEVOXサーバーからスキーマを更新
+bun run update-schema
+```
 
 ## ライセンス
 
 MIT
+
+## 貢献
+
+プルリクエストや Issue の報告は歓迎です。
+
+## 関連プロジェクト
+
+- [VOICEVOX](https://voicevox.hiroshiba.jp/)
+- [VOICEVOX ENGINE](https://github.com/VOICEVOX/voicevox_engine)
+- [Orval](https://orval.dev)
