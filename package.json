@@ -36,7 +36,7 @@
   ],
   "private": false,
   "scripts": {
-    "dev": "nodemon src/index.ts",
+    "dev": "nodemon --exec tsx src/index.ts",
     "build": "tsc --project tsconfig.build.json",
     "build:dual": "npm run build && npm run build:cjs",
     "build:cjs": "tsc --project tsconfig.build.json --module commonjs --outDir dist-cjs && mv dist-cjs/index.js dist/index.cjs",
