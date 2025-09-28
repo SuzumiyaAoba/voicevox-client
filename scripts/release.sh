@@ -29,6 +29,23 @@ log_error() {
     echo -e "${RED}❌ $1${NC}"
 }
 
+# Function to increment patch version
+increment_patch_version() {
+    local version="$1"
+    
+    # Remove prerelease suffix if exists
+    local base_version=$(echo "$version" | sed 's/-.*$//')
+    
+    # Split version into major.minor.patch
+    IFS='.' read -r major minor patch <<< "$base_version"
+    
+    # Increment patch version
+    patch=$((patch + 1))
+    
+    # Return new version with -dev suffix
+    echo "${major}.${minor}.${patch}-dev"
+}
+
 # Check if version is provided
 if [ -z "$1" ]; then
     log_error "Version is required"
@@ -143,3 +160,20 @@ elif command -v xdg-open &> /dev/null; then
     log_info "Opening GitHub Actions page..."
     xdg-open "https://github.com/SuzumiyaAoba/voicevox-client/actions"
 fi
+
+# Increment patch version for next development cycle
+log_info "Preparing for next development cycle..."
+NEXT_VERSION=$(increment_patch_version "$VERSION")
+log_info "Bumping version to $NEXT_VERSION for development"
+
+# Update package.json with new development version
+npm version $NEXT_VERSION --no-git-tag-version
+
+# Commit the version bump
+git add package.json
+git commit -m "chore: bump version to $NEXT_VERSION for development"
+
+# Push the development version bump
+git push origin $CURRENT_BRANCH
+
+log_success "Version bumped to $NEXT_VERSION for next development cycle"

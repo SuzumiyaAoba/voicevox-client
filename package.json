@@ -1,7 +1,7 @@
 {
   "name": "@suzumiyaaoba/voicevox-client",
-  "version": "0.1.0",
-  "description": "TypeScript client library for VOICEVOX ENGINE OSS. Auto-generated from OpenAPI schema using Orval.",
+  "version": "0.2.0",
+  "description": "TypeScript client library for VOICEVOX ENGINE OSS. Auto-generated from OpenAPI schema using openapi-fetch and openapi-typescript.",
   "homepage": "https://github.com/SuzumiyaAoba/voicevox-client",
   "bugs": {
     "url": "https://github.com/SuzumiyaAoba/voicevox-client/issues"
@@ -44,7 +44,7 @@
     "test:run": "vitest run",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
-    "generate": "orval --config ./orval.config.ts",
+    "generate": "tsx scripts/generate-types.ts",
     "format": "npx @biomejs/biome check --write .",
     "check": "npx @biomejs/biome check .",
     "fix": "npm run format",
@@ -63,7 +63,7 @@
     "husky": "^9.1.7",
     "lint-staged": "^16.2.1",
     "nodemon": "^3.1.7",
-    "orval": "^7.12.2",
+    "tsx": "^4.20.6",
     "vite": "^7.1.7",
     "vitest": "^3.2.4"
   },
@@ -81,7 +81,8 @@
     "api-client",
     "typescript",
     "openapi",
-    "orval",
+    "openapi-fetch",
+    "openapi-typescript",
     "audio",
     "speech",
     "japanese",
@@ -103,5 +104,9 @@
     "*.{json,md}": [
       "npx @biomejs/biome format --write --no-errors-on-unmatched"
     ]
+  },
+  "dependencies": {
+    "openapi-fetch": "^0.14.0",
+    "openapi-typescript": "^7.9.1"
   }
 }
