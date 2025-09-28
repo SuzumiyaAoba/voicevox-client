@@ -17,7 +17,7 @@
     "lineWidth": 100
   },
   "linter": {
-    "enabled": false,
+    "enabled": true,
     "rules": {
       "recommended": true
     }
