@@ -23,10 +23,8 @@ try {
   // Read the generated types file
   let typesContent = readFileSync(TYPES_OUTPUT_PATH, 'utf-8');
 
-  // Add export for the types
-  typesContent += '\n\nexport type { paths, components } from "./types";\n';
-
-  // Write the updated types file
+  // No need to add additional exports as openapi-typescript already exports everything
+  // Write the types file as is
   writeFileSync(TYPES_OUTPUT_PATH, typesContent);
 
   // Create client file manually
