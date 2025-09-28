@@ -1,8 +1,7 @@
 #!/usr/bin/env tsx
 
-import { execSync } from 'child_process';
-import { readFileSync, writeFileSync } from 'fs';
-import { join } from 'path';
+import { execSync } from 'node:child_process';
+import { readFileSync, writeFileSync } from 'node:fs';
 
 const API_SCHEMA_PATH = './api-schema/openapi.json';
 const TYPES_OUTPUT_PATH = './src/types.ts';
@@ -21,7 +20,7 @@ try {
   console.log('✨ Post-processing generated files...');
 
   // Read the generated types file
-  let typesContent = readFileSync(TYPES_OUTPUT_PATH, 'utf-8');
+  const typesContent = readFileSync(TYPES_OUTPUT_PATH, 'utf-8');
 
   // No need to add additional exports as openapi-typescript already exports everything
   // Write the types file as is
