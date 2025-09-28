@@ -41,6 +41,16 @@ export default client;
   // Write the client file
   writeFileSync(CLIENT_OUTPUT_PATH, clientContent);
 
+  // Format the generated files
+  console.log('🎨 Formatting generated files...');
+  try {
+    execSync('npx @biomejs/biome format --write src/types.ts src/client.ts', {
+      stdio: 'inherit',
+    });
+  } catch (formatError) {
+    console.warn('⚠️  Formatting failed, but continuing...', formatError);
+  }
+
   console.log('✅ Successfully generated OpenAPI types and client!');
 } catch (error) {
   console.error('❌ Error generating types and client:', error);
