@@ -6,7 +6,7 @@
 [![codecov](https://codecov.io/gh/SuzumiyaAoba/voicevox-client/branch/main/graph/badge.svg)](https://codecov.io/gh/SuzumiyaAoba/voicevox-client)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-VOICEVOX ENGINE OSS向けのTypeScriptクライアントライブラリです。[Orval](https://orval.dev)を使用してOpenAPIスキーマから自動生成されています。
+VOICEVOX ENGINE OSS向けのTypeScriptクライアントライブラリです。`openapi-fetch` と `openapi-typescript` によりOpenAPIスキーマから型安全なクライアントを提供します。
 
 ## インストール
 
@@ -19,49 +19,55 @@ npm install @suzumiyaaoba/voicevox-client
 ### 基本的な使用例
 
 ```typescript
-import { speakers, audioQuery, synthesis } from '@suzumiyaaoba/voicevox-client';
+import client from '@suzumiyaaoba/voicevox-client';
 
 // スピーカー一覧を取得
-const speakersResponse = await speakers();
-console.log(speakersResponse.data);
+const speakersRes = await client.GET('/speakers');
+console.log(speakersRes.data);
 
 // 音声合成用のクエリを作成
-const audioQueryResponse = await audioQuery({
-  text: 'こんにちは',
-  speaker: 3
+const aqRes = await client.POST('/audio_query', {
+  params: { query: { text: 'こんにちは', speaker: 3 } },
 });
 
-// 音声を合成
-const synthesisResponse = await synthesis(audioQueryResponse.data, {
-  speaker: 3
+// 音声を合成（WAVをBlobで取得）
+const synthRes = await client.POST('/synthesis', {
+  params: { query: { speaker: 3 } },
+  body: aqRes.data!,
+  parseAs: 'blob',
 });
 
-// Blobとして音声データを取得
-const audioBlob = synthesisResponse.data;
+const audioBlob = synthRes.data; // Blob
 ```
 
 ### その他のAPI
 
 ```typescript
-import { 
-  version, 
-  coreVersions, 
-  supportedDevices,
-  getUserDictWords,
-  addUserDictWord
-} from '@suzumiyaaoba/voicevox-client';
+import client from '@suzumiyaaoba/voicevox-client';
 
 // エンジンのバージョンを取得
-const versionResponse = await version();
-console.log(versionResponse.data);
+const versionRes = await client.GET('/version');
+console.log(versionRes.data);
 
 // 対応デバイス情報を取得
-const devicesResponse = await supportedDevices();
-console.log(devicesResponse.data);
+const devicesRes = await client.GET('/supported_devices');
+console.log(devicesRes.data);
 
 // ユーザー辞書の単語を取得
-const dictWordsResponse = await getUserDictWords();
-console.log(dictWordsResponse.data);
+const dictRes = await client.GET('/user_dict');
+console.log(dictRes.data);
+
+// ユーザー辞書に単語を追加
+const addRes = await client.POST('/user_dict_word', {
+  params: {
+    query: {
+      surface: 'VOICEVOX',
+      pronunciation: 'ボイスボックス',
+      accent_type: 1,
+    },
+  },
+});
+console.log(addRes.data);
 ```
 
 ## API仕様
@@ -140,4 +146,5 @@ MIT
 
 - [VOICEVOX](https://voicevox.hiroshiba.jp/)
 - [VOICEVOX ENGINE](https://github.com/VOICEVOX/voicevox_engine)
-- [Orval](https://orval.dev)
+- `openapi-fetch`（`https://github.com/drwpow/openapi-fetch`）
+- `openapi-typescript`（`https://github.com/drwpow/openapi-typescript`）
