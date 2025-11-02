@@ -114,7 +114,7 @@ jobs:
       - name: Check licenses
         run: |
           echo "Checking dependency licenses..."
-          license-checker --onlyAllow "MIT;Apache-2.0;BSD-2-Clause;BSD-3-Clause;ISC;0BSD;Python-2.0" --excludePrivatePackages || {
+          license-checker --onlyAllow "MIT;Apache-2.0;BSD-2-Clause;BSD-3-Clause;ISC;0BSD;Python-2.0;BlueOak-1.0.0" --excludePrivatePackages || {
             echo "❌ Found dependencies with incompatible licenses"
             echo "Generating detailed license report..."
             license-checker --csv > license-report.csv
