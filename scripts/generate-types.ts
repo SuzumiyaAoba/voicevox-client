@@ -29,7 +29,7 @@ try {
   // Create client file manually
   console.log('🔧 Creating client...');
   const clientContent = `import createClient from 'openapi-fetch';
-import type { paths } from './types';
+import type { paths } from './types.js';
 
 export const client = createClient<paths>({
   baseUrl: 'http://localhost:50021',
