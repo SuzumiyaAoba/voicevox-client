@@ -12,7 +12,7 @@ console.log('🔧 Generating OpenAPI types and client...');
 try {
   // Generate types using openapi-typescript
   console.log('📝 Generating TypeScript types...');
-  execSync(`npx openapi-typescript ${API_SCHEMA_PATH} -o ${TYPES_OUTPUT_PATH}`, {
+  execSync(`yarn openapi-typescript ${API_SCHEMA_PATH} -o ${TYPES_OUTPUT_PATH}`, {
     stdio: 'inherit',
   });
 
@@ -44,7 +44,7 @@ export default client;
   // Format the generated files
   console.log('🎨 Formatting generated files...');
   try {
-    execSync('npx @biomejs/biome format --write src/types.ts src/client.ts', {
+    execSync('yarn biome format --write src/types.ts src/client.ts', {
       stdio: 'inherit',
     });
   } catch (formatError) {

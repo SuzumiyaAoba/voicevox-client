@@ -15,7 +15,7 @@ api-schema/openapi.json
 1. スキーマファイルを配置
 2. API クライアントを生成:
    ```bash
-   bun run generate
+   yarn generate
    ```
 
-これで `src/api/generated.ts` にタイプセーフな API クライアントが生成されます。
+これで `src/types.ts` と `src/client.ts` にタイプセーフな API クライアントが生成されます。
