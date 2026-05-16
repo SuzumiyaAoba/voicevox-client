@@ -32,7 +32,6 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: 20.19.0
-          cache: yarn
 
       - name: Enable Corepack
         run: corepack enable
@@ -64,7 +63,7 @@ jobs:
       - name: Update package.json version
         run: |
           VERSION="${{ github.event.inputs.version }}"
-          yarn version "$VERSION" --immediate
+          corepack yarn version "$VERSION" --immediate
           git add package.json
           git commit -m "chore: bump version to $VERSION"
           
