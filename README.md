@@ -11,7 +11,7 @@ VOICEVOX ENGINE OSS向けのTypeScriptクライアントライブラリです。
 ## インストール
 
 ```bash
-npm install @suzumiyaaoba/voicevox-client
+yarn add @suzumiyaaoba/voicevox-client
 ```
 
 ## 使用方法
@@ -88,50 +88,51 @@ console.log(addRes.data);
 ### 依存関係のインストール
 
 ```bash
-npm install
+corepack enable
+yarn install
 ```
 
 ### テストの実行
 
 ```bash
 # 通常のテスト実行
-npm run test
+yarn test
 
 # ワンタイムテスト実行
-npm run test:run
+yarn test:run
 
 # カバレッジ付きテスト
-npm run test:coverage
+yarn test:coverage
 
 # UI付きテスト
-npm run test:ui
+yarn test:ui
 ```
 
 ### ビルド
 
 ```bash
 # ESMビルド
-npm run build
+yarn build
 
 # ESM + CJS デュアルビルド
-npm run build:dual
+yarn build:dual
 ```
 
 ### コードフォーマット
 
 ```bash
 # チェックのみ
-npm run check
+yarn check
 
 # 自動修正
-npm run fix
+yarn fix
 ```
 
 ### スキーマの更新
 
 ```bash
 # ローカルのVOICEVOXサーバーからスキーマを更新
-npm run update-schema
+yarn update-schema
 ```
 
 ## ライセンス

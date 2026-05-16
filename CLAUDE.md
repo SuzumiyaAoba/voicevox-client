@@ -10,41 +10,42 @@ This is a TypeScript client library for VOICEVOX ENGINE OSS. The library provide
 
 ### Development
 ```bash
-npm install              # Install dependencies
-npm run dev             # Run development mode with nodemon and tsx
+corepack enable          # Enable the package manager pinned in package.json
+yarn install             # Install dependencies
+yarn dev                 # Run development mode with nodemon and tsx
 ```
 
 ### Testing
 ```bash
-npm run test            # Run tests in watch mode
-npm run test:run        # Run tests once
-npm run test:coverage   # Run tests with coverage report
-npm run test:ui         # Run tests with UI
+yarn test               # Run tests in watch mode
+yarn test:run           # Run tests once
+yarn test:coverage      # Run tests with coverage report
+yarn test:ui            # Run tests with UI
 ```
 
 ### Building
 ```bash
-npm run build           # Build ESM only (for development)
-npm run build:dual      # Build both ESM and CJS (for publishing)
+yarn build              # Build ESM only (for development)
+yarn build:dual         # Build both ESM and CJS (for publishing)
 ```
 
 ### Code Quality
 ```bash
-npm run check           # Check code formatting and linting (read-only)
-npm run fix             # Auto-fix formatting issues
+yarn check              # Check code formatting and linting (read-only)
+yarn fix                # Auto-fix formatting issues
 ```
 
 ### Type Generation
 ```bash
-npm run generate        # Generate types from OpenAPI schema
-npm run update-schema   # Fetch latest schema from local VOICEVOX server and regenerate types
+yarn generate           # Generate types from OpenAPI schema
+yarn update-schema      # Fetch latest schema from local VOICEVOX server and regenerate types
 ```
 
 ### VOICEVOX Server (Docker)
 ```bash
-npm run voicevox:start  # Start VOICEVOX ENGINE via docker-compose
-npm run voicevox:stop   # Stop VOICEVOX ENGINE
-npm run voicevox:logs   # View VOICEVOX ENGINE logs
+yarn voicevox:start     # Start VOICEVOX ENGINE via docker-compose
+yarn voicevox:stop      # Stop VOICEVOX ENGINE
+yarn voicevox:logs      # View VOICEVOX ENGINE logs
 ```
 
 ## Architecture
@@ -59,7 +60,7 @@ This project uses a code generation approach for maintaining type safety:
    - `src/types.ts`: Auto-generated TypeScript types (DO NOT EDIT MANUALLY)
    - `src/client.ts`: Auto-generated client with default configuration
 
-**Important**: When the VOICEVOX ENGINE API changes, run `npm run update-schema` to fetch the latest schema and regenerate types. The `src/types.ts` file is excluded from Biome linting since it's generated.
+**Important**: When the VOICEVOX ENGINE API changes, run `yarn update-schema` to fetch the latest schema and regenerate types. The `src/types.ts` file is excluded from Biome linting since it's generated.
 
 ### Source Structure
 
@@ -73,7 +74,7 @@ This project uses a code generation approach for maintaining type safety:
 The project uses dual-build approach for maximum compatibility:
 - **ESM**: Main build target via `tsconfig.build.json`
 - **CJS**: Additional CommonJS build for legacy Node.js environments
-- Both builds are generated during `npm run build:dual`
+- Both builds are generated during `yarn build:dual`
 
 TypeScript configs:
 - `tsconfig.json`: Development config with strict type checking, bundler module resolution
@@ -94,7 +95,7 @@ Tests use Vitest with:
 To change the client configuration (e.g., baseUrl, middleware):
 1. DO NOT edit `src/client.ts` directly (it's generated)
 2. Instead, modify `scripts/generate-types.ts` template
-3. Run `npm run generate` to regenerate the client
+3. Run `yarn generate` to regenerate the client
 
 ### Adding Tests
 

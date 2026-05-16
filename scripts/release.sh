@@ -103,7 +103,7 @@ fi
 
 # Run tests
 log_info "Running tests..."
-if ! npm run test:run; then
+if ! yarn test:run; then
     log_error "Tests failed"
     exit 1
 fi
@@ -111,7 +111,7 @@ log_success "Tests passed"
 
 # Run linting
 log_info "Running linter..."
-if ! npm run check; then
+if ! yarn check; then
     log_error "Linting failed"
     exit 1
 fi
@@ -119,7 +119,7 @@ log_success "Linting passed"
 
 # Build package
 log_info "Building package..."
-if ! npm run build:dual; then
+if ! yarn build:dual; then
     log_error "Build failed"
     exit 1
 fi
@@ -127,7 +127,7 @@ log_success "Build completed"
 
 # Update package.json version
 log_info "Updating package.json version to $VERSION..."
-npm version $VERSION --no-git-tag-version
+yarn version "$VERSION" --immediate
 
 # Commit version change
 git add package.json
@@ -167,7 +167,7 @@ NEXT_VERSION=$(increment_patch_version "$VERSION")
 log_info "Bumping version to $NEXT_VERSION for development"
 
 # Update package.json with new development version
-npm version $NEXT_VERSION --no-git-tag-version
+yarn version "$NEXT_VERSION" --immediate
 
 # Commit the version bump
 git add package.json
