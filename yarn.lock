@@ -128,16 +128,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biomejs/cli-linux-x64@npm:2.4.15":
+"@biomejs/cli-linux-x64@npm:2.4.15, @biomejs/cli-linux-x64@npm:^2.4.14":
   version: 2.4.15
   resolution: "@biomejs/cli-linux-x64@npm:2.4.15"
-  conditions: os=linux & cpu=x64 & libc=glibc
-  languageName: node
-  linkType: hard
-
-"@biomejs/cli-linux-x64@npm:^2.4.14":
-  version: 2.4.14
-  resolution: "@biomejs/cli-linux-x64@npm:2.4.14"
   conditions: os=linux & cpu=x64 & libc=glibc
   languageName: node
   linkType: hard
