@@ -2,7 +2,6 @@ name: Security
 
 on:
   schedule:
-    # 毎日午前9時（JST）に実行
     - cron: '0 0 * * *'
   push:
     branches: [main, master]
@@ -11,140 +10,75 @@ on:
 
 permissions:
   contents: read
-  security-events: write
-  actions: read
 
 jobs:
-  # dependency-review job removed to avoid failures on repos without GHAS
+  dependency-review:
+    name: Dependency Review
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Review dependencies and licenses
+        uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+        with:
+          fail-on-severity: moderate
+          allow-licenses: MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC, 0BSD, Python-2.0, BlueOak-1.0.0, MPL-2.0
 
   audit:
     name: Security Audit
     runs-on: ubuntu-latest
     env:
-      ROLLUP_SKIP_NODEJS_NATIVE: '1'
       CI: 'true'
-    
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
-        
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          node-version: 20.19.0
-
-      - name: Enable Corepack
-        run: corepack enable
-      
-      - name: Install dependencies
-        run: corepack yarn install --immutable
-        
-      - name: Run security audit
+          persist-credentials: false
+      - name: Setup Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22.22.2
+          package-manager-cache: false
+      - name: Setup Corepack
         run: |
-          echo "Running yarn npm audit..."
-          corepack yarn npm audit -A --recursive --severity moderate || echo "yarn npm audit completed with warnings"
-          
-      
+          npm install --global --ignore-scripts corepack@0.36.0
+          corepack enable
+      - name: Verify and install dependencies
+        run: corepack yarn install --immutable --check-cache
+      - name: Run security audit
+        run: corepack yarn npm audit --all --recursive --severity moderate
 
   codeql:
     name: CodeQL Analysis
     runs-on: ubuntu-latest
-    
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
-        
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v4
+        uses: github/codeql-action/init@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4.39.0
         with:
-          languages: javascript
+          languages: javascript-typescript, actions
+          build-mode: none
           queries: security-and-quality
-          
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: 20.19.0
-
-      - name: Enable Corepack
-        run: corepack enable
-      
-      - name: Install dependencies
-        run: corepack yarn install --immutable
-        
-      - name: Build for CodeQL
-        run: corepack yarn build
-        
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v4
+        uses: github/codeql-action/analyze@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4.39.0
 
   secret-scan:
     name: Secret Scanning
     runs-on: ubuntu-latest
-    
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
-        
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
       - name: Run TruffleHog OSS
-        uses: trufflesecurity/trufflehog@main
+        uses: trufflesecurity/trufflehog@e76dff8a7e57d6df0c60ad8cbf5d5cba505a8fc9 # v3.99.2
         with:
-          path: ./
-          base: main
-          head: HEAD
-          extra_args: --debug --only-verified
-
-  license-check:
-    name: License Compliance
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-        
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: 20.19.0
-
-      - name: Enable Corepack
-        run: corepack enable
-      
-      - name: Install dependencies
-        run: corepack yarn install --immutable
-        
-      - name: Check licenses
-        run: |
-          echo "Checking dependency licenses..."
-          corepack yarn dlx license-checker --onlyAllow "MIT;Apache-2.0;BSD-2-Clause;BSD-3-Clause;ISC;0BSD;Python-2.0;BlueOak-1.0.0;MPL-2.0" --excludePrivatePackages || {
-            echo "❌ Found dependencies with incompatible licenses"
-            echo "Generating detailed license report..."
-            corepack yarn dlx license-checker --csv > license-report.csv
-            cat license-report.csv
-            exit 1
-          }
-          echo "✅ All dependency licenses are compatible"
-
-  malware-scan:
-    name: Malware Scanning
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-        
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: 20.19.0
-
-      - name: Enable Corepack
-        run: corepack enable
-        
-      - name: Install dependencies
-        run: corepack yarn install --immutable
-        
-      - name: Run Socket scan
-        run: |
-          # 依存関係の悪意あるパッケージスキャン
-          corepack yarn dlx socket audit package.json || echo "Socket scan completed with warnings"
-        continue-on-error: true
+          version: 3.99.2
+          extra_args: --only-verified

@@ -15,7 +15,7 @@
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
             # TypeScript development
-            nodejs_20
+            nodejs_22
             typescript
             
             # Docker for VOICEVOX API server

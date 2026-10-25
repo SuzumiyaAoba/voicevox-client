@@ -14,115 +14,126 @@ jobs:
     name: Test on Node.js ${{ matrix.node-version }}
     runs-on: ubuntu-latest
     env:
-      ROLLUP_SKIP_NODEJS_NATIVE: '1'
       CI: 'true'
-    
+
     strategy:
       matrix:
-        node-version: [20.19.0, 22.12.0, 24]
-    
+        node-version: ['22.22.2', '24.15.0', '26']
+
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
-        
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
       - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: ${{ matrix.node-version }}
+          package-manager-cache: false
 
-      - name: Enable Corepack
-        run: corepack enable
+      - name: Setup Corepack
+        run: |
+          npm install --global --ignore-scripts corepack@0.36.0
+          corepack enable
 
       - name: Install dependencies
-        run: corepack yarn install --immutable
+        run: corepack yarn install --immutable --check-cache
 
       - name: Run linter
         run: corepack yarn check
 
       - name: Run tests
         run: corepack yarn test:run
-        
+
       - name: Run tests with coverage
         run: corepack yarn test:coverage
-        
+
       - name: Build package
         run: corepack yarn build:dual
-        
+
       - name: Upload coverage to Codecov
-        if: matrix.node-version == '20.19.0'
-        uses: codecov/codecov-action@v6
+        if: matrix.node-version == '22.22.2'
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          version: v11.3.1
           directory: ./coverage
           fail_ci_if_error: false
 
   build-check:
     name: Build Check
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 20.19.0
+          node-version: 22.22.2
+          package-manager-cache: false
 
-      - name: Enable Corepack
-        run: corepack enable
-        
+      - name: Setup Corepack
+        run: |
+          npm install --global --ignore-scripts corepack@0.36.0
+          corepack enable
+
       - name: Install dependencies
-        run: corepack yarn install --immutable
-        
+        run: corepack yarn install --immutable --check-cache
+
       - name: Build package
         run: corepack yarn build:dual
-        
+
       - name: Check build artifacts
         run: |
           test -f dist/index.js || (echo "ESM build missing" && exit 1)
           test -f dist/index.d.ts || (echo "Type definitions missing" && exit 1)
           test -f dist/index.cjs || (echo "CJS build missing" && exit 1)
-          
-      - name: Test package installation
+
+      - name: Test package imports
         run: |
-          # Test package.json exports
-          node -e "
-            const pkg = require('./package.json');
-            console.log('Package name:', pkg.name);
-            console.log('Version:', pkg.version);
-            console.log('Main:', pkg.main);
-            console.log('Types:', pkg.types);
-            console.log('Exports:', JSON.stringify(pkg.exports, null, 2));
-          "
-          
+          node --input-type=module -e "import { strict as assert } from 'node:assert'; import client from './dist/index.js'; assert.equal(typeof client.GET, 'function'); assert.equal(typeof client.POST, 'function');"
+          node -e "const assert = require('node:assert/strict'); const { client } = require('./dist/index.cjs'); assert.equal(typeof client.GET, 'function'); assert.equal(typeof client.POST, 'function');"
+
       - name: Validate package
         run: corepack yarn pack --dry-run
 
   type-check:
     name: TypeScript Type Check
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 20.19.0
+          node-version: 22.22.2
+          package-manager-cache: false
 
-      - name: Enable Corepack
-        run: corepack enable
-        
+      - name: Setup Corepack
+        run: |
+          npm install --global --ignore-scripts corepack@0.36.0
+          corepack enable
+
       - name: Install dependencies
-        run: corepack yarn install --immutable
-        
+        run: corepack yarn install --immutable --check-cache
+
       - name: Generate API types
         run: corepack yarn generate
-        
+
+      - name: Verify generated files are current
+        run: git diff --exit-code -- src/client.ts src/types.ts
+
       - name: Run TypeScript type check
         run: corepack yarn tsc --noEmit
-        
+
       - name: Run TypeScript type check for build
         run: corepack yarn tsc --project tsconfig.build.json --noEmit

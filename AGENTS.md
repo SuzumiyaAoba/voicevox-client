@@ -7,7 +7,7 @@
 - Build outputs are placed in `dist/` (ESM) and `dist-cjs/` (temporary CJS build folder); coverage reports land in `coverage/`.
 
 ## Build, Test, and Development Commands
-- `corepack enable && yarn install` — install dependencies with the project-pinned Yarn v4 (Node 20.19+ or 22.12+).
+- `corepack enable && yarn install --immutable` — install dependencies with the project-pinned Yarn v4 (Node 22.22.2+, 24.15.0+, or 26+; see `package.json` for supported ranges).
 - `yarn dev` — run `src/index.ts` with `nodemon`/`tsx` for iterative development.
 - `yarn build` — build ESM to `dist/`; `yarn build:dual` also writes `dist/index.cjs`.
 - `yarn test` — run Vitest in watch/interactive mode; `yarn test:run` is single-shot; `yarn test:coverage` emits V8 coverage to `coverage/`.
@@ -30,5 +30,8 @@
 - PRs should include a brief summary, testing notes, and link to any related issue. Add screenshots only when UI changes occur (rare here).
 
 ## Security & Configuration Tips
+- Preserve the 7-day release age gate, disabled dependency install scripts, and Yarn Hardened Mode. Use `yarn install --immutable --check-cache` in CI.
+- Pin direct dependencies to exact versions and GitHub Actions to full commit SHAs. Review Dependabot PRs manually.
+- Keep TypeScript on 5.9.3 until `openapi-typescript` supports a newer compiler API.
 - Do not commit API keys or engine credentials. The default client base URL is `http://localhost:50021`; override at runtime if pointing to remote hosts.
 - Docker-based schema updates require the local VOICEVOX engine running; stop containers when not in use.

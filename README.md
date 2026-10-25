@@ -87,10 +87,28 @@ console.log(addRes.data);
 
 ### 依存関係のインストール
 
+Node.js 22.22.2 以上の 22 系、24.15.0 以上の 24 系、または 26 以上を使用します。
+Yarn は `package.json` の `packageManager` に固定しています。
+
 ```bash
 corepack enable
-yarn install
+yarn install --immutable
 ```
+
+Corepack が付属しない Node.js では、先に `npm install --global --ignore-scripts corepack@0.36.0` を実行してください。
+Git フックを使用する場合は、インストール後に `yarn prepare` を実行します。
+
+### 依存関係の安全な更新
+
+- 依存パッケージのインストールスクリプトを無効化し、公開から 7 日以上経過した版だけを採用します。
+- Yarn の Hardened Mode とチェックサム検証を有効にし、CI では `yarn install --immutable --check-cache` でロックファイルと配布物を検証します。
+- 直接依存は完全なバージョン番号、GitHub Actions はコミット SHA に固定します。更新時は公開日・差分・互換性を確認してください。
+- Dependabot にも 7 日間の待機期間を設定し、自動承認・自動マージは行いません。Vitest 関連は同時に更新します。
+- CI とリリースでは中程度以上の既知の脆弱性を検出したら停止します。PR では依存関係とライセンスの変更も検査します。
+- `openapi-typescript@7.13.0` は TypeScript 5 のコンパイラ API を使用するため、TypeScript は互換性のある最新の 5.9.3 に固定しています。
+
+更新後は `yarn generate`、`yarn format`、`yarn test:run`、`yarn test:coverage`、`yarn build:dual`、`yarn tsc --noEmit`、`yarn npm audit --all --recursive --severity moderate` を実行します。
+待機期間やスクリプト制限を無効にして更新を通さないでください。
 
 ### テストの実行
 
