@@ -398,8 +398,8 @@ __metadata:
   linkType: hard
 
 "@redocly/openapi-core@npm:^1.34.6":
-  version: 1.34.21
-  resolution: "@redocly/openapi-core@npm:1.34.21"
+  version: 1.34.22
+  resolution: "@redocly/openapi-core@npm:1.34.22"
   dependencies:
     "@redocly/ajv": "npm:8.11.2"
     "@redocly/config": "npm:0.22.0"
@@ -410,7 +410,7 @@ __metadata:
     minimatch: "npm:5.1.9"
     pluralize: "npm:8.0.0"
     yaml-ast-parser: "npm:0.0.43"
-  checksum: 10c0/f24a5b3e862ea93d185b9d3440d2f8459a9d98f50e48c22c7e62bd595bb33c2545a5296c5fc9a630b53dd042515bb651d4d7bf85632f34da497106be241e47dd
+  checksum: 10c0/b433e642149f666be6614f1cfc662a3c17febff2bc012b39c45281a418e235e1d921312b1757a56c91dfb6c7b048ae5f376a1d358eebaa6d5d5cdba4593cc59f
   languageName: node
   linkType: hard
 
