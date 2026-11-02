@@ -1845,9 +1845,9 @@ __metadata:
   linkType: hard
 
 "uri-js-replace@npm:^1.0.1":
-  version: 1.0.1
-  resolution: "uri-js-replace@npm:1.0.1"
-  checksum: 10c0/0be6c972c84c316e29667628ce7b4ce4de7fc77cec9a514f70c4a3336eea8d1d783c71c9988ac5da333f0f6a85a04a7ae05a3c4aa43af6cd07b7a4d85c8d9f11
+  version: 1.0.2
+  resolution: "uri-js-replace@npm:1.0.2"
+  checksum: 10c0/12c7878afd2e1b2f478e61238404e0f64d5344c2da6322238b252eee073ce249a12f8b3245e9c235eb007095ac01e2bbddac0a197c8f600225fd82468dde13f4
   languageName: node
   linkType: hard
 
